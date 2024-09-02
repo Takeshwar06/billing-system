@@ -1,0 +1,326 @@
+import React, { useState } from 'react';
+import { Button } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+
+const Home = () => {
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [locationSearch, setLocationSearch] = useState('');
+  const [isCustomerFocused, setIsCustomerFocused] = useState(false);
+  const [isLocationFocused, setIsLocationFocused] = useState(false);
+  const [searchComponents, setSearchComponents] = useState([
+    { itemSearch: '', brandSearch: '',qty:0,rate:0,amount:0, isItemFocused: false, isBrandFocused: false }
+  ]);
+const [tax,setTax]=useState({basic:0,CGST:0,SGST:0,IGST:0,netAmount:0})
+
+  const items = [
+    { name: "laptop", brand: ["hp", "lenovo", "asus"] },
+    { name: "mouse", brand: ["hp", "dell"] }
+  ];
+
+  const brand = [
+    { name: "hp", item: ["laptop", "mouse"] },
+    { name: "lenovo", item: ["laptop"] },
+    { name: "dell", item: ["laptop", "mouse"] },
+  ];
+
+
+  const customers = [
+    { name: "tiger", location: ["bhilai", "raipur", "gumanpur"] },
+    { name: "takesh", location: ["bhilai", "gumanpur"] }
+  ];
+
+  const locations = [
+    { address: "bhilai", customer: ["tiger", "takesh"] },
+    { address: "raipur", customer: ["tiger"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+    { address: "gumanpur", customer: ["tiger", "takesh"] },
+  ];
+
+  const handleCustomerChange = (event) => {
+    setCustomerSearch(event.target.value);
+  };
+
+  const handleLocationChange = (event) => {
+    setLocationSearch(event.target.value);
+  };
+
+  // Filter customers based on customer search term and location search term
+  const filteredCustomers = customers.filter(customer => {
+    const matchesName = customer.name.toLowerCase().includes(customerSearch.toLowerCase());
+    const matchesLocation = locationSearch === '' || customer.location.some(loc => loc.toLowerCase().includes(locationSearch.toLowerCase()));
+    return matchesName && matchesLocation;
+  });
+
+  // Filter locations based on location search term and customer search term
+  const filteredLocations = locations.filter(location => {
+    const matchesAddress = location.address.toLowerCase().includes(locationSearch.toLowerCase());
+    const matchesCustomer = customerSearch === '' || location.customer.some(cust => cust.toLowerCase().includes(customerSearch.toLowerCase()));
+    return matchesAddress && matchesCustomer;
+  });
+
+  const handleItemChange = (index, event) => {
+    const newSearchComponents = [...searchComponents];
+    newSearchComponents[index].itemSearch = event.target.value;
+    setSearchComponents(newSearchComponents);
+  };
+
+  const handleBrandChange = (index, event) => {
+    const newSearchComponents = [...searchComponents];
+    newSearchComponents[index].brandSearch = event.target.value;
+    setSearchComponents(newSearchComponents);
+  };
+
+  const handleAddNewComponent = () => {
+    setSearchComponents([...searchComponents, { itemSearch: '', brandSearch: '', isItemFocused: false, isBrandFocused: false }]);
+  };
+
+  const handleSubmit = ()=>{
+    console.log("handlsubmt");
+  }
+  return (
+    <form onSubmit={handleSubmit} className='w-full flex justify-center'>
+      <div className='md:w-[800px] w-full'>
+        {/* basic detail of bill */}
+        <div className=" mx-auto p-2 bg-white shadow-md rounded-lg">
+          <label htmlFor="customer" className="block text-sm font-medium text-gray-700">
+            Customer:
+          </label>
+          <input
+            type="text"
+            id="customer"
+            value={customerSearch}
+            onChange={handleCustomerChange}
+            onFocus={() => setIsCustomerFocused(true)}
+            onBlur={() => setTimeout(() => setIsCustomerFocused(false), 200)}
+            placeholder="Search customer..."
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            minLength={"4"}
+            required
+          />
+          {isCustomerFocused && filteredCustomers.length > 0 && (
+            <ul className="border border-gray-300 rounded bg-white max-h-40 overflow-y-auto">
+              {filteredCustomers.map((customer, index) => (
+                <li
+                  key={index}
+                  className="p-2 hover:bg-blue-100 cursor-pointer"
+                  onMouseDown={() => setCustomerSearch(customer.name)}
+                >
+                  {customer.name}
+                </li>
+              ))}
+            </ul>
+          )}
+          <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+            Location:
+          </label>
+          <input
+            type="text"
+            id="location"
+            value={locationSearch}
+            onChange={handleLocationChange}
+            onFocus={() => setIsLocationFocused(true)}
+            onBlur={() => setTimeout(() => setIsLocationFocused(false), 200)}
+            placeholder="Search location..."
+            className="w-full p-2  border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            minLength={"4"}
+            required
+          />
+          {isLocationFocused && filteredLocations.length > 0 && (
+            <ul className="border border-gray-300 rounded  bg-white max-h-40 overflow-y-auto">
+              {filteredLocations.map((location, index) => (
+                <li
+                  key={index}
+                  className="p-2 hover:bg-blue-100 cursor-pointer"
+                  onMouseDown={() => setLocationSearch(location.address)}
+                >
+                  {location.address}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <label htmlFor="bill-number" className="block text-sm font-medium text-gray-700">
+            Bill No:
+          </label>
+          <input
+            type="text"
+            id="bill-number"
+            // value={customerSearch}
+            placeholder="Enter bill number"
+            className="w-full p-2  border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            minLength={"4"}
+            maxLength={"30"}
+            required
+          />
+
+          <label htmlFor="bill-date" className="block text-sm font-medium text-gray-700">
+            Bill Date:
+          </label>
+          <input
+            type="date"
+            id="bill-date"
+            // value={customerSearch}
+            placeholder="Enter bill number"
+            className="w-full p-2  border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+
+        <Button onClick={handleAddNewComponent}>New</Button>
+
+        {/*  this part for mulitple item */}
+        {searchComponents.map((component, index) => {
+          const filteredItems = items.filter(item => {
+            const matchesName = item.name.toLowerCase().includes(component.itemSearch.toLowerCase());
+            const matchesBrand = component.brandSearch === '' || item.brand.some(brand => brand.toLowerCase().includes(component.brandSearch.toLowerCase()));
+            return matchesName && matchesBrand;
+          });
+
+          const filteredBrands = brand.filter(brandItem => {
+            const matchesName = brandItem.name.toLowerCase().includes(component.brandSearch.toLowerCase());
+            const matchesItem = component.itemSearch === '' || brandItem.item.some(item => item.toLowerCase().includes(component.itemSearch.toLowerCase()));
+            return matchesName && matchesItem;
+          });
+
+          return (
+            <div key={index} className="mx-auto mb-2 p-2 bg-white shadow-md rounded-lg">
+              <div className='flex justify-end'>
+                <DeleteIcon className='cursor-pointer' color='warning'/>
+              </div>
+              <div className=''>
+                <label htmlFor={`brand-${index}`} className="block text-sm font-medium text-gray-700 ">
+                 Brand:
+                </label>
+                <input
+                  type="text"
+                  id={`brand-${index}`}
+                  minLength={"4"}
+                  value={component.brandSearch}
+                  onChange={(event) => handleBrandChange(index, event)}
+                  onFocus={() => {
+                    const newSearchComponents = [...searchComponents];
+                    newSearchComponents[index].isBrandFocused = true;
+                    setSearchComponents(newSearchComponents);
+                  }}
+                  onBlur={() => setTimeout(() => {
+                    const newSearchComponents = [...searchComponents];
+                    newSearchComponents[index].isBrandFocused = false;
+                    setSearchComponents(newSearchComponents);
+                  }, 200)}
+                  placeholder="Search brand..."
+                  className="w-full p-2  border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              {component.isBrandFocused && filteredBrands.length > 0 && (
+                <ul className="border border-gray-300 rounded bg-white max-h-40 overflow-y-auto">
+                  {filteredBrands.map((brandItem, brandIndex) => (
+                    <li
+                      key={brandIndex}
+                      className="p-2 hover:bg-blue-100 cursor-pointer"
+                      onMouseDown={() => {
+                        const newSearchComponents = [...searchComponents];
+                        newSearchComponents[index].brandSearch = brandItem.name;
+                        setSearchComponents(newSearchComponents);
+                      }}
+                    >
+                      {brandItem.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <label htmlFor={`item-${index}`} className="block text-sm font-medium text-gray-700 ">
+                Item:
+              </label>
+              <input
+                type="text"
+                minLength={"4"}
+                id={`item-${index}`}
+                value={component.itemSearch}
+                onChange={(event) => handleItemChange(index, event)}
+                onFocus={() => {
+                  const newSearchComponents = [...searchComponents];
+                  newSearchComponents[index].isItemFocused = true;
+                  setSearchComponents(newSearchComponents);
+                }}
+                onBlur={() => setTimeout(() => {
+                  const newSearchComponents = [...searchComponents];
+                  newSearchComponents[index].isItemFocused = false;
+                  setSearchComponents(newSearchComponents);
+                }, 200)}
+                placeholder="Search item..."
+                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {component.isItemFocused && filteredItems.length > 0 && (
+                <ul className="border border-gray-300 rounded bg-white max-h-40 overflow-y-auto">
+                  {filteredItems.map((item, itemIndex) => (
+                    <li
+                      key={itemIndex}
+                      className="p-2 hover:bg-blue-100 cursor-pointer"
+                      onMouseDown={() => {
+                        const newSearchComponents = [...searchComponents];
+                        newSearchComponents[index].itemSearch = item.name;
+                        setSearchComponents(newSearchComponents);
+                      }}
+                    >
+                      {item.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <label htmlFor={`qty-${index}`} className="block text-sm font-medium text-gray-700">
+                Qty:
+              </label>
+              <input
+                type="number"
+                id={`qty-${index}`}
+                // value={customerSearch}
+                placeholder="Enter Qty"
+                className="w-full p-2  border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                min={"1"}
+              />
+
+              <label htmlFor={`rate-${index}`} className="block text-sm font-medium text-gray-700">
+                Rate:
+              </label>
+              <input
+                type="number"
+                id={`rate-${index}`}
+                // value={customerSearch}
+                placeholder="Enter bill number"
+                className="w-full p-2  border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                min={"1"}
+              />
+              <label htmlFor={`amount-${index}`} className="block text-sm font-medium text-gray-700">
+                Amount:
+              </label>
+              <input
+                type="number"
+                id={`amount-${index}`}
+                // value={customerSearch}
+                placeholder="Enter bill number"
+                className="w-full p-2  border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                min={"1"}
+              />
+            </div>
+          );
+        
+        })}
+      <Button type='submit' variant="secondary" >Save</Button>
+      </div>
+    </form>
+  );
+};
+
+export default Home;
