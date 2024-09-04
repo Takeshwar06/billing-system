@@ -10,7 +10,7 @@ module.exports = (err, req, res, next) => {
     err = new ApiError(400, message);  
   }
 
-  res.status(err.statusCode).json({
+  res.status(200).json({
     success: false,
     message: err.message,
   });
