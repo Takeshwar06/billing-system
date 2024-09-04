@@ -75,7 +75,6 @@ export default function CreateMasterItem() {
             name:row.itemName, 
             unit: row.unit,
             defaultRate:row.defaultRate,
-        
             brand:row.brandName,
         })
       })

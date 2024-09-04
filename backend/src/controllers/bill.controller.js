@@ -74,8 +74,8 @@ module.exports.createBill = asyncHandler(async (req, res, next) => {
 
   const billNoExist = await Bill.find({ number: billNumber });
   if (billNoExist.length > 0) {
-    return res.status(200).json({
-      success: false,
+    return res.status(200).json({ 
+      success: false,  
       message: "Bill Number already exists; do you want to update?",
       billExist: true,
     });

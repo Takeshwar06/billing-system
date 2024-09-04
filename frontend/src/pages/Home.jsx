@@ -337,7 +337,7 @@ const Home = () => {
         onSubmit={handleSubmit}
         className="fixed p-3 top-0 left-0 w-[400px] h-[calc(100vh)] overflow-y-auto bg-slate-50 z-10"
       >
-        {/* <SideNav /> */}
+        { /* <SideNav /> */ }
         <div className="flex justify-center mb-2">
           <p className=" px-2 bg-lime-300 rounded-md">Basic Details:</p>
         </div>

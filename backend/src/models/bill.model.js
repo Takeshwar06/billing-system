@@ -74,12 +74,12 @@ const billSchema = new Schema({
     },
     customer: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Customer', // Assuming you have a Customer model
+        ref: 'Customer', 
         required: true,
     },
     location: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Location', // Assuming you have a Location model
+        ref: 'Location', 
         required: true,
     },
     items: [itemSchema],
