@@ -9,7 +9,7 @@ const itemSchema = new mongoose.Schema({
     unit: {
         type: String,
         enum: {
-            values: ['kg', 'litre', 'piece', 'meter'], 
+            values: ['kg', 'liter', 'piece', 'meter'], 
             message: '{VALUE} is not a valid unit, allowed values are kg, litre, piece, meter' 
         }, 
         required: true,
@@ -19,7 +19,7 @@ const itemSchema = new mongoose.Schema({
         required: true,
     },
 
-    brand: [{
+    brand: [{ 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Brand',
     }],

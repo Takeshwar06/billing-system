@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import {
@@ -121,7 +122,6 @@ const Home = () => {
     setLocationSearch(event.target.value);
   };
 
-  // Filter customers based on search terms
   const filteredCustomers = customers.filter((customer) => {
     const matchesName = customer.name
       .toLowerCase()
@@ -134,7 +134,6 @@ const Home = () => {
     return matchesName && matchesLocation;
   });
 
-  // Filter locations based on search terms
   const filteredLocations = locations.filter((location) => {
     const matchesAddress = location.address
       .toLowerCase()
@@ -173,17 +172,7 @@ const Home = () => {
       );
     return matchesName && matchesItem;
   });
-  // const handleItemChange = ( event) => {
-  //   const newLocalItems = [...searchComponent];
-  //   newSearchComponents[index].itemSearch = event.target.value;
-  //   setSearchComponents(newSearchComponents);
-  // };
 
-  // const handleBrandChange = (index, event) => {
-  //   const newSearchComponents = [...searchComponents];
-  //   newSearchComponents[index].brandSearch = event.target.value;
-  //   setSearchComponents(newSearchComponents);
-  // };
 
   useEffect(() => {
     const basic = localItems.reduce(
@@ -226,21 +215,16 @@ const Home = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(customers, customerSearch);
-    if (!customers.some((customer) => customer.name === customerSearch)) {
-      alert(`${customerSearch} is not in master customer please add first`);
-      return;
-    }
     if (localItems.length < 1) {
-      alert("please add at least one item");
+      toast.info("please add at least one item!")
       return;
     }
     setIsLoading(true);
-    console.log("handleSubmit");
     let newItems = [];
-    let notExistedItem=null;
+    let notExistedItem = null;
     localItems.forEach((itm) => {
       if (!items.some((i) => i.name === itm.itemSearch)) {
-         notExistedItem=itm.itemSearch;
+        notExistedItem = itm.itemSearch;
       }
       const item = {
         name: itm.itemSearch,
@@ -253,11 +237,6 @@ const Home = () => {
       newItems.push(item);
     });
 
-    if(notExistedItem!==null){
-      alert(`${notExistedItem} is not in master item please first add`)
-      setIsLoading(false);
-      return;
-    }
     const billDetail = {
       customerName: customerSearch,
       customerLocation: locationSearch,
@@ -281,27 +260,29 @@ const Home = () => {
     const response = await axios.post(createBill, billDetail);
     console.log(response);
     if (response.data.success) {
-      alert("bill is created successfully");
+      toast.success("bill is created successfully!")
       setIsLoading(false);
       setRefreshItemBrandCustomerLocation(!refreshItemBrandCustomerLocation);
       resetInputField();
     } else if (response.data.billExist) {
+      toast.info(response.data.message);
       if (window.confirm(response.data.message)) {
         const updateRes = await axios.put(updateBill, billDetail);
         console.log(updateRes);
         if (updateRes.data.success) {
           setRefreshItemBrandCustomerLocation(
-            !refreshItemBrandCustomerLocation
+            !refreshItemBrandCustomerLocation 
           );
           resetInputField();
           setIsLoading(false);
-          alert(updateRes.data.message);
+          toast.success(updateRes.data.message);
         } else {
-          alert(updateRes.data.message);
+          toast.info(updateRes.data.message);
         }
       }
     } else {
-      alert(response.data.message);
+      toast.error(response.data.message);
+      setIsLoading(false);
     }
     setIsLoading(false);
   };
@@ -309,14 +290,18 @@ const Home = () => {
   const createOrUpdateItem = (e) => {
     e.preventDefault();
     console.log(isDialogOpen);
+    const selectedItem = items.find(itm=>itm.name===searchComponent.itemSearch)
     if (isDialogOpen.index === null) {
       const newLocalItems = [...localItems];
-      newLocalItems.push(searchComponent);
+      newLocalItems.push({...searchComponent,unit:selectedItem?selectedItem.unit:""});
       setLocalItems(newLocalItems);
+      toast.success("Item created successfully!");
     } else {
       const newLocalItems = [...localItems];
-      newLocalItems[isDialogOpen.index] = searchComponent;
+      const selectedItem = items.find(itm=>itm.name===searchComponent.itemSearch)
+      newLocalItems[isDialogOpen.index] = {...searchComponent,unit:selectedItem?selectedItem.unit:""};
       setLocalItems(newLocalItems);
+      toast.success("Item updated successfully!");
     }
 
     setSearchComponent({
@@ -332,12 +317,12 @@ const Home = () => {
     });
   };
   return (
-    <div className="flex flex-col h-screen">
+    <>
       <form
         onSubmit={handleSubmit}
-        className="fixed p-3 top-0 left-0 w-[400px] h-[calc(100vh)] overflow-y-auto bg-slate-50 z-10"
+        className="fixed p-3 top-[70px] left-0 w-[400px] h-[calc(100vh)] overflow-y-auto bg-slate-50 z-10"
       >
-        { /* <SideNav /> */ }
+        {/* <SideNav /> */}
         <div className="flex justify-center mb-2">
           <p className=" px-2 bg-lime-300 rounded-md">Basic Details:</p>
         </div>
@@ -440,7 +425,7 @@ const Home = () => {
           />
         </div>
         {/* Taxes */}
-        <div className="mx-auto p-2 mb-5 bg-gray-50 shadow-md rounded-lg">
+        <div className="mx-auto p-2 mb-5 bg-white shadow-md rounded-lg">
           <div className="flex justify-center mb-2">
             <p className=" px-2 bg-lime-300 rounded-md">TAX</p>
           </div>
@@ -574,7 +559,7 @@ const Home = () => {
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-between mb-4">
+        <div className="flex justify-between mb-[60px]">
           <div>
             <Button
               onClick={() => navigate("/reports")}
@@ -597,8 +582,6 @@ const Home = () => {
           <Button
             disabled={isLoading}
             type="submit"
-            // variant="contained"
-            // color="success"
             className="mt-4"
           >
             {isLoading ? "Loading..." : "SAVE"}
@@ -606,7 +589,7 @@ const Home = () => {
         </div>
       </form>
 
-      <div className="flex-1 ml-[400px] mt-0 px-5 py-2 overflow-y-auto">
+      <div className="flex-1 ml-[400px] mt-[70px] px-5 py-2 overflow-y-auto">
         {/* <Outlet /> */}
         <div className="flex justify-start mb-2">
           <Button
@@ -616,8 +599,6 @@ const Home = () => {
                 index: null,
               })
             }
-            // variant="contained"
-            // color="info"
           >
             Create New Item
           </Button>
@@ -654,12 +635,12 @@ const Home = () => {
                     minLength="4"
                     required
                     value={searchComponent.itemSearch}
-                    onChange={(event) =>
+                    onChange={(event) =>{
                       setSearchComponent((prevSearh) => ({
                         ...prevSearh,
                         itemSearch: event.target.value,
                       }))
-                    }
+                    }}
                     onFocus={(event) =>
                       setSearchComponent((prevSearh) => ({
                         ...prevSearh,
@@ -890,7 +871,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

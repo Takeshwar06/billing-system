@@ -27,10 +27,59 @@ module.exports.getCustomersLocationsItemsBrands = asyncHandler(async(req,res,nex
 module.exports.getCustomers = asyncHandler(async(req,res,next)=>{
     const customers = await Customer.find()
     .populate('location');
-    return res.status(201).json(new ApiResponse(201, customers, 'all customer fetched successfully'));
+
+    const locations = await Location.find()
+    .populate('customer');
+    return res.status(201).json(new ApiResponse(201, {customers,locations}, 'all customer fetched successfully'));
 })
 
+module.exports.createCustomers = asyncHandler(async(req,res,next)=>{
+    const {customers}=req.body;
 
+    for (const element of customers) {
+        if (element.name.length < 4) {
+          return next(
+            new ApiError(
+              400,
+              `Customer name should be at least 4 characters, error in ${element.name}`
+            )
+          );
+        }
+        if (element.location.length < 4) {
+          return next(
+            new ApiError(
+              400,
+              `Location should be at least 4 characters, error in ${element.location}`
+            )
+          );
+        }
+        const customerNameLower = element.name.toLowerCase();
+        const locationLower = element.location.toLowerCase();
+    
+        let customer = await Customer.findOne({ name: customerNameLower });
+        if (!customer) {
+            customer = await Customer.create({
+            name: customerNameLower,
+          });
+        }
+    
+        let location = await Location.findOne({ name: locationLower });
+        if (!location) {
+            location = await Location.create({ address: locationLower });
+        }
+    
+        if (!customer.location.includes(location._id)) {
+            customer.location.push(location._id);
+          await customer.save();
+        }
+    
+        if (!location.customer.includes(customer._id)) {
+            location.customer.push(customer._id);
+          await location.save();
+        }
+    }
+    return res.status(201).json(new ApiResponse(201, {}, 'Custoemrs created successfully'));
+})
 
 
 

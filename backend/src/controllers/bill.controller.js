@@ -84,25 +84,25 @@ module.exports.createBill = asyncHandler(async (req, res, next) => {
   const customerNameLower = customerName.toLowerCase();
   const customerLocationLower = customerLocation.toLowerCase();
 
-  let customer = await Customer.findOne({ name: customerNameLower });
+  let customer = await Customer.findOne({ name: customerNameLower }).populate('location');
   if (!customer) {
-    customer = await Customer.create({ name: customerNameLower });
+    return next(
+      new ApiError(
+        400,
+        `Customer Name ${customerNameLower} not exist`
+      )
+    );
   }
-
-  let location = await Location.findOne({ address: customerLocationLower });
-  if (!location) {
-    location = await Location.create({ address: customerLocationLower });
+  // console.log(customer);
+  if(!customer.location.some(lcn=>lcn.address===customerLocationLower)){
+    return next(
+      new ApiError(
+        400,
+        `Customer Name ${customerNameLower} with Location ${customerLocationLower} not exist`
+      )
+    );
   }
-
-  if (!customer.location.includes(location._id)) {
-    customer.location.push(location._id);
-    await customer.save();
-  }
-
-  if (!location.customer.includes(customer._id)) {
-    location.customer.push(customer._id);
-    await location.save();
-  }
+  const location = await Location.findOne({address:customerLocationLower});
 
   let basic = 0;
 
@@ -126,28 +126,22 @@ module.exports.createBill = asyncHandler(async (req, res, next) => {
     const itemNameLower = element.name.toLowerCase();
     const brandNameLower = element.brand.toLowerCase();
 
-    let item = await Item.findOne({ name: itemNameLower });
+    let item = await Item.findOne({ name: itemNameLower }).populate("brand");
     if (!item) {
-      item = await Item.create({
-        name: itemNameLower,
-        unit: element.unit,
-        defaultRate: element.rate,
-      });
+      return next(
+        new ApiError(
+          400,
+          `Item ${itemNameLower} not exist`
+        )
+      );
     }
-
-    let brand = await Brand.findOne({ name: brandNameLower });
-    if (!brand) {
-      brand = await Brand.create({ name: brandNameLower });
-    }
-
-    if (!item.brand.includes(brand._id)) {
-      item.brand.push(brand._id);
-      await item.save();
-    }
-
-    if (!brand.item.includes(item._id)) {
-      brand.item.push(item._id);
-      await brand.save();
+    if (!item.brand.some(bnd=>bnd.name===brandNameLower)) {
+      return next(
+        new ApiError(
+          400,
+          `Item ${itemNameLower} with Brand ${brandNameLower} not exist`
+        )
+      );
     }
 
     if (element.qty < 1) {
@@ -227,22 +221,20 @@ module.exports.updateBill = asyncHandler(async (req, res, next) => {
 
   let customer = await Customer.findOne({ name: customerNameLower });
   if (!customer) {
-    customer = await Customer.create({ name: customerNameLower });
+    return next(
+      new ApiError(
+        400,
+        `Customer->${customerNameLower} not exist`
+      )
+    );
   }
-
-  let location = await Location.findOne({ address: customerLocationLower });
-  if (!location) {
-    location = await Location.create({ address: customerLocationLower });
-  }
-
-  if (!customer.location.includes(location._id)) {
-    customer.location.push(location._id);
-    await customer.save();
-  }
-
-  if (!location.customer.includes(customer._id)) {
-    location.customer.push(customer._id);
-    await location.save();
+  if(!customer.location.some(lcn=>lcn.name===customerLocationLower)){
+    return next(
+      new ApiError(
+        400,
+        `Customer->${customerNameLower},${customerLocationLower} not exist`
+      )
+    );
   }
 
   let basic = 0;
@@ -269,26 +261,20 @@ module.exports.updateBill = asyncHandler(async (req, res, next) => {
 
     let item = await Item.findOne({ name: itemNameLower });
     if (!item) {
-      item = await Item.create({
-        name: itemNameLower,
-        unit: element.unit,
-        defaultRate: element.rate,
-      });
+      return next(
+        new ApiError(
+          400,
+          `Item->${itemNameLower} not exist`
+        )
+      );
     }
-
-    let brand = await Brand.findOne({ name: brandNameLower });
-    if (!brand) {
-      brand = await Brand.create({ name: brandNameLower });
-    }
-
-    if (!item.brand.includes(brand._id)) {
-      item.brand.push(brand._id);
-      await item.save();
-    }
-
-    if (!brand.item.includes(item._id)) {
-      brand.item.push(item._id);
-      await brand.save();
+    if (!item.brand.some(bnd=>bnd.name===brandNameLower)) {
+      return next(
+        new ApiError(
+          400,
+          `Item->${itemNameLower},${brandNameLower} not exist`
+        )
+      );
     }
 
     if (element.qty < 1) {
@@ -309,13 +295,13 @@ module.exports.updateBill = asyncHandler(async (req, res, next) => {
   }
 
   const updatedBill = await Bill.updateOne(
-    { number: billNumber }, // Condition to match the bill by billNumber
+    { number: billNumber }, 
     {
       $set: {
         customer: customer._id,
         location: location._id,
         date: billDate,
-        items: items, // Replace the entire items array with the new one
+        items: items, 
         tax: {
           basic: basic,
           CGST: {

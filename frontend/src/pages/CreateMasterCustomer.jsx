@@ -2,28 +2,36 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import axios from "axios";
-import { createItems, getItems } from "@/api/ApiRoutes";
+import { createCustomers, createItems, getCustomers, getItems } from "@/api/ApiRoutes";
 import { toast } from "react-toastify";
-
-export default function CreateMasterItem() {
+export default function CreateMasterCustomer() {
   const navigate = useNavigate();
-  const [items, setItems] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [refreshItemsBrands,setRefreshItemsBrands]=useState(false);
-
+  const [customers, setCustomers] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [refreshCustomersLocations,setRefreshCustomersLocations]=useState(false);
+  const [items, setItems] = useState([
+    { name: "Laptop", brand: "Dell", unit: "piece", defaultRate: 750 },
+    { name: "Mouse", brand: "Logitech", unit: "piece", defaultRate: 25 },
+    { name: "Milk", brand: "Amul", unit: "liter", defaultRate: 50 },
+    { name: "Keyboard", brand: "Corsair", unit: "piece", defaultRate: 100 },
+    { name: "Desk Chair", brand: "Herman Miller", unit: "piece", defaultRate: 500 }
+  ]);
+const fetchItems = ()=>{
+  
+}
   useEffect(() => {
     (async () => {
-      const response = await axios.get(getItems);
+      const response = await axios.get(getCustomers);
       if (response.data.success) {
         console.log(response.data.data);
-        setItems(response.data.data.items);
-        setBrands(response.data.data.brands);
+        setCustomers(response.data.data.customers);
+        setLocations(response.data.data.locations);
       }
     })();
-  }, [refreshItemsBrands]);
+  }, [refreshCustomersLocations]);
   // State to manage multiple rows of form data
   const [rows, setRows] = useState([
-    { itemName: "", brandName: "", unit: "", defaultRate: 0 },
+    { customerName: "", customerLocation: "" },
   ]);
 
   const handleChange = (index, e) => {
@@ -36,7 +44,7 @@ export default function CreateMasterItem() {
   const addNewRow = () => {
     setRows([
       ...rows,
-      { itemName: "", brandName: "", unit: "", defaultRate: "" },
+      { customerName: "", customerLocation: "" },
     ]);
   };
 
@@ -52,66 +60,48 @@ export default function CreateMasterItem() {
       toast.info("add at least one item");
       return;
     }
-    const existingItems = items.map((item) => item.name.toLowerCase()); // Convert item names to lowercase for comparison
-    const existingbrands = brands.map((brand) => brand.name.toLowerCase());
-    let alreadyPresentItems = [];
+    const existingItems = customers.map((customer) => customer.name.toLowerCase()); // Convert item names to lowercase for comparison
+    const existingbrands = locations.map((location) => location.address.toLowerCase());
+    let alreadyPresentCustomers = [];
 
     rows.forEach((row) => {
       if (
-        existingItems.includes(row.itemName.toLowerCase()) &&
-        existingbrands.includes(row.brandName.toLowerCase())
+        existingItems.includes(row.customerName.toLowerCase()) &&
+        existingbrands.includes(row.customerLocation.toLowerCase())
       ) {
-        alreadyPresentItems.push(`${row.itemName} -> ${row.brandName}`);
+        alreadyPresentCustomers.push(`${row.customerName} -> ${row.customerLocation}`);
       }
     });
 
-    if (alreadyPresentItems.length > 0) {
-      console.log(
-        "These items are already present:",
-        alreadyPresentItems.join(", ")
-      );
-      toast.info(`These items are already present: ${alreadyPresentItems.join(", ")}`)
+    if (alreadyPresentCustomers.length > 0) {
+      toast.info( `These customer are already present: ${alreadyPresentCustomers.join(", ")}`)
     } else {
       console.log("No duplicates found. Proceeding with submission.");
       // Proceed with form submission logic here
-      const newItems = [];
-      let unitExecption = false;
+      const newCustomers = [];
       rows.forEach((row) => {
-        if (
-          !["kg", "liter", "piece", "meter"].some((itm) => itm === row.unit)
-        ) {
-          unitExecption = true;
-        }
-        newItems.push({
-          name: row.itemName,
-          unit: row.unit,
-          defaultRate: row.defaultRate,
-          brand: row.brandName,
+        newCustomers.push({
+          name: row.customerName,
+          location: row.customerLocation,
         });
       });
-      if (unitExecption) {
-        toast.info("select unit from ['kg', 'litre', 'piece', 'meter']");
-        return;
-      }
+
       // backend
-      console.log(newItems);
-      const response = await axios.post(createItems,{items:newItems})
+      console.log(newCustomers);
+      const response = await axios.post(createCustomers,{customers:newCustomers})
       console.log(response);
       if(response.data.success){
         toast.success(response.data.message);
-        setRefreshItemsBrands(!refreshItemsBrands)
+        setRefreshCustomersLocations(!refreshCustomersLocations)
         setRows([
-          { itemName: "", brandName: "", unit: "", defaultRate: "" },
-        ]);
+            { customerName: "", customerLocation: "" },
+          ]);
       }else{
         toast.error(response.data.message);
       }
     }
   };   
 
-const fetchItems = ()=>{
-  
-}
   return (
     <div className="w-full flex flex-col items-center">
       <div className="my-4">
@@ -131,13 +121,11 @@ const fetchItems = ()=>{
           <table className="min-w-full bg-white border border-gray-200">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-4 py-2 text-left text-gray-600">Item Name</th>
                 <th className="px-4 py-2 text-left text-gray-600">
-                  Brand Name
+                  Customer Name
                 </th>
-                <th className="px-4 py-2 text-left text-gray-600">Unit</th>
                 <th className="px-4 py-2 text-left text-gray-600">
-                  Default Rate
+                  Customer Location
                 </th>
                 <th className="px-4 py-2 text-left text-gray-600">Actions</th>
               </tr>
@@ -148,65 +136,28 @@ const fetchItems = ()=>{
                   <td className="px-4 py-2 text-gray-700">
                     <input
                       type="text"
-                      name="itemName"
+                      name="customerName"
                       required
                       minLength={4}
-                      value={row.itemName}
+                      value={row.customerName}
                       onChange={(e) => handleChange(index, e)}
                       className="w-full border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      placeholder="Enter item name"
+                      placeholder="Enter customer name"
                     />
                   </td>
                   <td className="px-4 py-2 text-gray-700">
                     <input
                       type="text"
-                      name="brandName"
-                      value={row.brandName}
+                      name="customerLocation"
+                      value={row.customerLocation}
                       required
                       minLength={4}
                       onChange={(e) => handleChange(index, e)}
                       className="w-full border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      placeholder="Enter brand name"
+                      placeholder="Enter customer location"
                     />
                   </td>
-                  <td className="px-4 py-2 text-gray-700">
-                    {/* <input
-                    type="text"
-                    name="unit"
-                    value={row.unit}
-                    required
-                    onChange={(e) => handleChange(index, e)}
-                    className="w-full border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    placeholder="Enter unit"
-                  /> */}
-                    <select
-                      name="unit"
-                      value={row.unit}
-                      required
-                      onChange={(e) => handleChange(index, e)}
-                      className="w-full border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    >
-                      <option value="" disabled>
-                        Select unit
-                      </option>
-                      <option value="kg">kg</option>
-                      <option value="liter">liter</option>
-                      <option value="piece">piece</option>
-                      <option value="meter">meter</option>
-                    </select>
-                  </td>
-                  <td className="px-4 py-2 text-gray-700">
-                    <input
-                      type="number"
-                      name="defaultRate"
-                      required
-                      min={"0"}
-                      value={row.defaultRate}
-                      onChange={(e) => handleChange(index, e)}
-                      className="w-full border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      placeholder="Enter default rate"
-                    />
-                  </td>
+                  
                   <td className="px-4 py-2 text-gray-700">
                     <Button
                       onClick={() => removeRow(index)}
@@ -244,8 +195,6 @@ const fetchItems = ()=>{
         </div>
       </form>
 
-
-      
       {/* New Section to Fetch and Display Items */}
       <div className="my-4 w-[90%]">
         <div className="flex justify-center">
@@ -272,7 +221,7 @@ const fetchItems = ()=>{
               {items.map((item, index) => (
                 <tr className="border-b" key={index}>
                   <td className="px-4 py-2 text-gray-700">{item.name}</td>
-                  <td className="px-4 py-2 text-gray-700">brand</td>
+                  <td className="px-4 py-2 text-gray-700">{item.brand}</td>
                   <td className="px-4 py-2 text-gray-700">{item.unit}</td>
                   <td className="px-4 py-2 text-gray-700">{item.defaultRate}</td>
                 </tr>

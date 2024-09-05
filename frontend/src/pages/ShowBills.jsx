@@ -3,6 +3,7 @@ import { Button } from "@mui/material";
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function ShowBills() {
   const [isLoading,setIsLoading]=useState(false);
@@ -38,16 +39,13 @@ export default function ShowBills() {
       // Remove the bill from the state array
       setBills((prevBills) => prevBills.filter((_, i) => i !== index));
     } else {
-      alert(response.data.message);
+      toast.error(response.data.message);
     }
   }
   return (
    <div>
-     <div className="w-full flex flex-col items-center">
+     <div className="w-full mt-[70px] flex flex-col items-center">
       <div className="my-4 ">
-        <p className="mb-4 text-3xl bg-gray-400 text-slate-900 text-center p-2 rounded-md">
-          SHOW BILL
-        </p>
         <form
           onSubmit={handleGetBill}
           className="flex justify-center items-center"
