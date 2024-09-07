@@ -11,13 +11,16 @@ export default function AppRoutes() {
     <div className="flex flex-col h-screen">
       <div className="fixed top-0 left-0 flex justify-between items-center w-full h-[70px] bg-gray-800 text-white z-10">
         {/* <Header /> */}
-        <div className="ml-28">
+        <div className="ml-24">
           <Link to="/">
             <h1 className="text-2xl">Billing System</h1>
           </Link>
         </div>
-        <div className="mr-28">
+        <div className="mr-24">
           <nav>
+            <Link className="ml-10 text-sm uppercase" to="/">
+              Home
+            </Link>
             <Link className="ml-10 text-sm uppercase" to="/bills">
               Show Bills
             </Link>

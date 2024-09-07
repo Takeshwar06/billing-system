@@ -1,0 +1,27 @@
+
+MongoDB connected successfully:  cluster0-shard-00-02.pqgad.mongodb.net
+server is running on port: \\.\pipe\82c7921f-d356-4fa0-9dfb-5ad89d92344b
+[
+  {
+    name: 'Eiar bard',
+    brand: 'OnePlus Buds 3.',
+    unit: 'piece',
+    defaultRate: '8999'
+  }
+]
+[
+  {
+    name: 'Eiar bard',
+    brand: 'Amazon Basics Earbuds (AB-T01B)',
+    unit: 'piece',
+    defaultRate: '9999'
+  }
+]
+[
+  {
+    name: 'eiar bard',
+    brand: 'Boult Audio Z20 Pro',
+    unit: 'piece',
+    defaultRate: '6999'
+  }
+]

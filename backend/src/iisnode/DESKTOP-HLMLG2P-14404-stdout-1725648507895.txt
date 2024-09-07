@@ -1,0 +1,97 @@
+
+MongoDB connected successfully:  cluster0-shard-00-00.pqgad.mongodb.net
+server is running on port: \\.\pipe\272f0fca-b504-4474-896a-ccd9ab6cf431
+[
+  { name: 'laptop', brand: 'apple', unit: 'piece', defaultRate: '999' }
+]
+[ { name: 'mouse', brand: 'dell', unit: 'piece', defaultRate: '899' } ]
+[
+  {
+    name: 'charger',
+    brand: 'lenovo',
+    unit: 'liter',
+    defaultRate: '67'
+  }
+]
+[
+  { name: 'mouse', brand: 'hppc', unit: 'piece', defaultRate: '9999' }
+]
+[
+  { name: 'mouse', brand: 'lenovo', unit: 'piece', defaultRate: '899' }
+]
+[
+  {
+    name: 'mobile',
+    brand: 'apple',
+    unit: 'piece',
+    defaultRate: '99999'
+  }
+]
+{
+  _id: new ObjectId('66db06c489526495cabe51a6'),
+  name: 'amin',
+  location: [
+    {
+      _id: new ObjectId('66db06c489526495cabe51a9'),
+      address: 'khairagadh',
+      customer: [Array],
+      createdAt: 2024-09-06T13:42:28.193Z,
+      updatedAt: 2024-09-06T19:23:10.708Z,
+      __v: 2
+    }
+  ],
+  createdAt: 2024-09-06T13:42:28.128Z,
+  updatedAt: 2024-09-06T13:42:28.225Z,
+  __v: 1
+}
+{
+  _id: new ObjectId('66db06c489526495cabe51a6'),
+  name: 'amin',
+  location: [
+    {
+      _id: new ObjectId('66db06c489526495cabe51a9'),
+      address: 'khairagadh',
+      customer: [Array],
+      createdAt: 2024-09-06T13:42:28.193Z,
+      updatedAt: 2024-09-06T19:23:10.708Z,
+      __v: 2
+    }
+  ],
+  createdAt: 2024-09-06T13:42:28.128Z,
+  updatedAt: 2024-09-06T13:42:28.225Z,
+  __v: 1
+}
+{
+  _id: new ObjectId('66db06c489526495cabe51a6'),
+  name: 'amin',
+  location: [
+    {
+      _id: new ObjectId('66db06c489526495cabe51a9'),
+      address: 'khairagadh',
+      customer: [Array],
+      createdAt: 2024-09-06T13:42:28.193Z,
+      updatedAt: 2024-09-06T19:23:10.708Z,
+      __v: 2
+    }
+  ],
+  createdAt: 2024-09-06T13:42:28.128Z,
+  updatedAt: 2024-09-06T13:42:28.225Z,
+  __v: 1
+}
+{
+  _id: new ObjectId('66db06c489526495cabe51a6'),
+  name: 'amin',
+  location: [
+    {
+      _id: new ObjectId('66db06c489526495cabe51a9'),
+      address: 'khairagadh',
+      customer: [Array],
+      createdAt: 2024-09-06T13:42:28.193Z,
+      updatedAt: 2024-09-06T19:23:10.708Z,
+      __v: 2
+    }
+  ],
+  createdAt: 2024-09-06T13:42:28.128Z,
+  updatedAt: 2024-09-06T13:42:28.225Z,
+  __v: 1
+}

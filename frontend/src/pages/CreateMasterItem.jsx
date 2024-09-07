@@ -9,7 +9,7 @@ export default function CreateMasterItem() {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [brands, setBrands] = useState([]);
-  const [refreshItemsBrands,setRefreshItemsBrands]=useState(false);
+  const [refreshItemsBrands, setRefreshItemsBrands] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -45,88 +45,71 @@ export default function CreateMasterItem() {
     setRows(newRows);
   };
 
-  const handleGetBill = async(e) => {
+  const handleGetBill = async (e) => {
     e.preventDefault();
 
     if (rows.length < 1) {
       toast.info("add at least one item");
       return;
     }
-    const existingItems = items.map((item) => item.name.toLowerCase()); // Convert item names to lowercase for comparison
-    const existingbrands = brands.map((brand) => brand.name.toLowerCase());
-    let alreadyPresentItems = [];
-
-    rows.forEach((row) => {
-      if (
-        existingItems.includes(row.itemName.toLowerCase()) &&
-        existingbrands.includes(row.brandName.toLowerCase())
-      ) {
-        alreadyPresentItems.push(`${row.itemName} -> ${row.brandName}`);
-      }
-    });
-
-    if (alreadyPresentItems.length > 0) {
-      console.log(
-        "These items are already present:",
-        alreadyPresentItems.join(", ")
-      );
-      toast.info(`These items are already present: ${alreadyPresentItems.join(", ")}`)
-    } else {
-      console.log("No duplicates found. Proceeding with submission.");
-      // Proceed with form submission logic here
-      const newItems = [];
-      let unitExecption = false;
-      rows.forEach((row) => {
-        if (
-          !["kg", "liter", "piece", "meter"].some((itm) => itm === row.unit)
-        ) {
-          unitExecption = true;
-        }
-        newItems.push({
-          name: row.itemName,
-          unit: row.unit,
-          defaultRate: row.defaultRate,
-          brand: row.brandName,
-        });
-      });
-      if (unitExecption) {
-        toast.info("select unit from ['kg', 'litre', 'piece', 'meter']");
-        return;
-      }
-      // backend
-      console.log(newItems);
-      const response = await axios.post(createItems,{items:newItems})
-      console.log(response);
-      if(response.data.success){
-        toast.success(response.data.message);
-        setRefreshItemsBrands(!refreshItemsBrands)
-        setRows([
-          { itemName: "", brandName: "", unit: "", defaultRate: "" },
-        ]);
-      }else{
-        toast.error(response.data.message);
-      }
-    }
-  };   
-
-const fetchItems = ()=>{
+    const existingItems = items.find(
+      (item) => item.name.toLowerCase() === rows[0].itemName.toLocaleLowerCase()
+    );
   
-}
+    let isItemExist;
+    if(existingItems){
+         isItemExist = existingItems.brand.some(
+          (bnd) =>
+            bnd.name.toLocaleLowerCase() ===
+            rows[0].brandName.toLocaleLowerCase()
+        );
+    }
+
+    if (isItemExist) {
+      toast.info("Item with the give Brand already exist");
+      return;
+    }
+    if (
+      !["kg", "liter", "piece", "meter"].some((itm) => itm === rows[0].unit)
+    ) {
+      toast.info('unit should be taken from ["kg", "liter", "piece", "meter"]');
+      return;
+    }
+
+    // backend
+    const response = await axios.post(createItems, {
+      items: [
+        {
+          name: rows[0].itemName,
+          brand: rows[0].brandName,
+          unit: rows[0].unit,
+          defaultRate: rows[0].defaultRate,
+        },
+      ],
+    });
+    console.log(response);
+    if (response.data.success) {
+      toast.success(response.data.message);
+      setRefreshItemsBrands(!refreshItemsBrands);
+      setRows([{ itemName: "", brandName: "", unit: "", defaultRate: "" }]);
+    } else {
+      toast.error(response.data.message);
+    }
+  };
+  const fetchItems = () => {};
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="my-4">
-        <div className="flex justify-center items-center">
-          <Button
-            onClick={() => navigate("/")}
-            size="medium"
-            variant="contained"
-            color="primary"
-          >
-            HOME
-          </Button>
-        </div>
-      </div>
+    <div className="w-full mt-[70px] flex flex-col items-center">
       <form onSubmit={handleGetBill}>
+        <div className=" mt-8 mb-2">
+          {/* <Button
+            onClick={addNewRow}
+            size="small"
+            variant="contained"
+            color="secondary"
+          >
+            Add New
+          </Button> */}
+        </div>
         <div className="overflow-x-auto w-[90%]">
           <table className="min-w-full bg-white border border-gray-200">
             <thead className="bg-gray-100">
@@ -200,7 +183,7 @@ const fetchItems = ()=>{
                       type="number"
                       name="defaultRate"
                       required
-                      min={"0"}
+                      min="0"
                       value={row.defaultRate}
                       onChange={(e) => handleChange(index, e)}
                       className="w-full border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -209,48 +192,37 @@ const fetchItems = ()=>{
                   </td>
                   <td className="px-4 py-2 text-gray-700">
                     <Button
-                      onClick={() => removeRow(index)}
+                      type="submit"
                       size="small"
                       variant="contained"
                       color="secondary"
                     >
-                      Remove
+                      Submit
                     </Button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <div className="flex justify-end mt-4">
-            <Button
-              onClick={addNewRow}
-              size="medium"
-              variant="contained"
-              color="secondary"
-            >
-              Add New
-            </Button>
-          </div>
-          <div className="flex justify-center mt-4">
+
+          {/* <div className="flex justify-end mt-2">
             <Button
               type="submit"
-              size="medium"
+              size="small"
               variant="contained"
               color="primary"
             >
               Submit
             </Button>
-          </div>
+          </div> */}
         </div>
       </form>
 
-
-      
       {/* New Section to Fetch and Display Items */}
       <div className="my-4 w-[90%]">
         <div className="flex justify-center">
           <Button
-            onClick={fetchItems}
+            onClick={() => setRefreshItemsBrands(!refreshItemsBrands)}
             size="medium"
             variant="contained"
             color="secondary"
@@ -263,18 +235,40 @@ const fetchItems = ()=>{
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-4 py-2 text-left text-gray-600">Item Name</th>
-                <th className="px-4 py-2 text-left text-gray-600">Brand Name</th>
+                <th className="px-4 py-2 text-left text-gray-600">
+                  Brand Name
+                </th>
                 <th className="px-4 py-2 text-left text-gray-600">Unit</th>
-                <th className="px-4 py-2 text-left text-gray-600">Default Rate</th>
+                <th className="px-4 py-2 text-left text-gray-600">
+                  Default Rate
+                </th>
               </tr>
             </thead>
             <tbody>
               {items.map((item, index) => (
                 <tr className="border-b" key={index}>
                   <td className="px-4 py-2 text-gray-700">{item.name}</td>
-                  <td className="px-4 py-2 text-gray-700">brand</td>
+                  <td className="px-4 py-2 text-gray-700">
+                    {
+                      <select
+                        name="brands"
+                        className=" border-none border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      >
+                        <option value="" disabled>
+                          Brands
+                        </option>
+                        {item.brand.map((brn) => {
+                          return (
+                            <option value={`${brn.name}`}>{brn.name}</option>
+                          );
+                        })}
+                      </select>
+                    }
+                  </td>
                   <td className="px-4 py-2 text-gray-700">{item.unit}</td>
-                  <td className="px-4 py-2 text-gray-700">{item.defaultRate}</td>
+                  <td className="px-4 py-2 text-gray-700">
+                    {item.defaultRate} Rs
+                  </td>
                 </tr>
               ))}
             </tbody>

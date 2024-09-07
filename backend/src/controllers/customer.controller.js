@@ -63,7 +63,7 @@ module.exports.createCustomers = asyncHandler(async(req,res,next)=>{
           });
         }
     
-        let location = await Location.findOne({ name: locationLower });
+        let location = await Location.findOne({ address: locationLower });
         if (!location) {
             location = await Location.create({ address: locationLower });
         }

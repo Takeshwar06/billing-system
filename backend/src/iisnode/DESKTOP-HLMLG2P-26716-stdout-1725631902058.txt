@@ -1,0 +1,3 @@
+
+MongoDB connected successfully:  cluster0-shard-00-02.pqgad.mongodb.net
+server is running on port: \\.\pipe\1c3fa662-5b53-45f5-a9a8-ef5d4a447ac9

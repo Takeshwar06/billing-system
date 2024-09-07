@@ -73,11 +73,12 @@ const Home = () => {
         setCustomerSearch(billForEdit.customer.name);
         setLocationSearch(billForEdit.location.address);
         setBillNumber(billForEdit.number);
-        setBillDate(billForEdit.data);
-
-        const { items, tax } = billForEdit;
+        setBillDate(billForEdit.date?.toString().split("T")[0]);
+        console.log(billForEdit.date);
+        const { tax } = billForEdit;
         const newLocalItems = [];
-        items.forEach((item) => {
+        billForEdit.items.forEach((item) => {
+          console.log("item", item);
           newLocalItems.push({
             itemSearch: item.name,
             brandSearch: item.brand,
@@ -173,7 +174,6 @@ const Home = () => {
     return matchesName && matchesItem;
   });
 
-
   useEffect(() => {
     const basic = localItems.reduce(
       (acc, localItem) => acc + (parseFloat(localItem.amount) || 0),
@@ -216,13 +216,14 @@ const Home = () => {
     e.preventDefault();
     console.log(customers, customerSearch);
     if (localItems.length < 1) {
-      toast.info("please add at least one item!")
+      toast.info("please add at least one item!");
       return;
     }
     setIsLoading(true);
     let newItems = [];
     let notExistedItem = null;
     localItems.forEach((itm) => {
+      console.log(itm.unit);
       if (!items.some((i) => i.name === itm.itemSearch)) {
         notExistedItem = itm.itemSearch;
       }
@@ -260,18 +261,18 @@ const Home = () => {
     const response = await axios.post(createBill, billDetail);
     console.log(response);
     if (response.data.success) {
-      toast.success("bill is created successfully!")
+      toast.success("bill is created successfully!");
       setIsLoading(false);
       setRefreshItemBrandCustomerLocation(!refreshItemBrandCustomerLocation);
       resetInputField();
     } else if (response.data.billExist) {
-      toast.info(response.data.message);
+      // toast.info(response.data.message);
       if (window.confirm(response.data.message)) {
         const updateRes = await axios.put(updateBill, billDetail);
         console.log(updateRes);
         if (updateRes.data.success) {
           setRefreshItemBrandCustomerLocation(
-            !refreshItemBrandCustomerLocation 
+            !refreshItemBrandCustomerLocation
           );
           resetInputField();
           setIsLoading(false);
@@ -290,16 +291,26 @@ const Home = () => {
   const createOrUpdateItem = (e) => {
     e.preventDefault();
     console.log(isDialogOpen);
-    const selectedItem = items.find(itm=>itm.name===searchComponent.itemSearch)
+    const selectedItem = items.find(
+      (itm) => itm.name === searchComponent.itemSearch
+    );
     if (isDialogOpen.index === null) {
       const newLocalItems = [...localItems];
-      newLocalItems.push({...searchComponent,unit:selectedItem?selectedItem.unit:""});
+      newLocalItems.push({
+        ...searchComponent,
+        unit: selectedItem ? selectedItem.unit : "",
+      });
       setLocalItems(newLocalItems);
       toast.success("Item created successfully!");
     } else {
       const newLocalItems = [...localItems];
-      const selectedItem = items.find(itm=>itm.name===searchComponent.itemSearch)
-      newLocalItems[isDialogOpen.index] = {...searchComponent,unit:selectedItem?selectedItem.unit:""};
+      const selectedItem = items.find(
+        (itm) => itm.name === searchComponent.itemSearch
+      );
+      newLocalItems[isDialogOpen.index] = {
+        ...searchComponent,
+        unit: selectedItem ? selectedItem.unit : "",
+      };
       setLocalItems(newLocalItems);
       toast.success("Item updated successfully!");
     }
@@ -559,31 +570,8 @@ const Home = () => {
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-between mb-[60px]">
-          <div>
-            <Button
-              onClick={() => navigate("/reports")}
-              // variant="contained"
-              // color="info"
-              className="mt-4"
-            >
-              REPORTS
-            </Button>
-            &nbsp;&nbsp;
-            <Button
-              onClick={() => navigate("/bills")}
-              // variant="contained"
-              // color="info"
-              className="mt-4"
-            >
-              SHOW BILLS
-            </Button>
-          </div>
-          <Button
-            disabled={isLoading}
-            type="submit"
-            className="mt-4"
-          >
+        <div className="flex justify-end mb-[60px]">
+          <Button disabled={isLoading} type="submit" className="mt-2 mb-2">
             {isLoading ? "Loading..." : "SAVE"}
           </Button>
         </div>
@@ -600,7 +588,7 @@ const Home = () => {
               })
             }
           >
-            Create New Item
+            New Item
           </Button>
         </div>
 
@@ -635,11 +623,11 @@ const Home = () => {
                     minLength="4"
                     required
                     value={searchComponent.itemSearch}
-                    onChange={(event) =>{
+                    onChange={(event) => {
                       setSearchComponent((prevSearh) => ({
                         ...prevSearh,
                         itemSearch: event.target.value,
-                      }))
+                      }));
                     }}
                     onFocus={(event) =>
                       setSearchComponent((prevSearh) => ({

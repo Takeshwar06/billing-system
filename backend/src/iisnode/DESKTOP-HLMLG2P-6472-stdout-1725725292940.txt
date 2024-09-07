@@ -1,0 +1,11 @@
+
+MongoDB connected successfully:  cluster0-shard-00-01.pqgad.mongodb.net
+server is running on port: \\.\pipe\dcf57cef-a6bf-4214-80c6-09c80cb81306
+[
+  {
+    name: 'head phone',
+    brand: 'apple',
+    unit: 'piece',
+    defaultRate: '9999'
+  }
+]

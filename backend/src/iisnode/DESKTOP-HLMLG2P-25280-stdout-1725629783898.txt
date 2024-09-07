@@ -1,0 +1,29 @@
+
+MongoDB connected successfully:  cluster0-shard-00-01.pqgad.mongodb.net
+server is running on port: \\.\pipe\708a3e01-4142-4e78-ad33-589a23d47cfd
+[
+  { name: 'laptop', unit: 'piece', defaultRate: '9999', brand: 'dell' }
+]
+[
+  {
+    name: 'laptop',
+    unit: 'piece',
+    defaultRate: '99999',
+    brand: 'lenovo'
+  }
+]
+[
+  {
+    name: 'charger',
+    unit: 'piece',
+    defaultRate: '89999',
+    brand: 'dell'
+  }
+]
+[
+  { name: 'laptop', unit: 'piece', defaultRate: '9999', brand: 'hppc' }
+]
+[ { name: 'milk', unit: 'kg', defaultRate: '89', brand: 'amul' } ]
+[
+  { name: 'speaker', unit: 'piece', defaultRate: '999', brand: 'hppc' }
+]

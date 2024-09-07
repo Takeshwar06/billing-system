@@ -1,0 +1,11 @@
+
+MongoDB connected successfully:  cluster0-shard-00-01.pqgad.mongodb.net
+server is running on port: \\.\pipe\72865864-ab51-494a-a2c4-ba6b41f6d87a
+[
+  {
+    name: 'speaker',
+    unit: 'piece',
+    defaultRate: '399',
+    brand: 'lanovo'
+  }
+]

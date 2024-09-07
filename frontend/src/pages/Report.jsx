@@ -120,7 +120,9 @@ export default function Report() {
                     </td>
                     <td class="px-4 py-2 text-gray-700">{value.location}</td>
                     <td class="px-4 py-2 text-gray-700">{value.billCount}</td>
-                    <td class="px-4 py-2 text-gray-700">{value.billAmount}</td>
+                    <td class="px-4 py-2 text-gray-700">
+                      {parseFloat(value.billAmount.toFixed(2))}
+                    </td>
                   </tr>
                 );
               })}

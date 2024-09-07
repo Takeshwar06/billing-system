@@ -74,8 +74,8 @@ module.exports.createBill = asyncHandler(async (req, res, next) => {
 
   const billNoExist = await Bill.find({ number: billNumber });
   if (billNoExist.length > 0) {
-    return res.status(200).json({ 
-      success: false,  
+    return res.status(200).json({
+      success: false,
       message: "Bill Number already exists; do you want to update?",
       billExist: true,
     });
@@ -84,17 +84,16 @@ module.exports.createBill = asyncHandler(async (req, res, next) => {
   const customerNameLower = customerName.toLowerCase();
   const customerLocationLower = customerLocation.toLowerCase();
 
-  let customer = await Customer.findOne({ name: customerNameLower }).populate('location');
+  let customer = await Customer.findOne({ name: customerNameLower }).populate(
+    "location"
+  );
   if (!customer) {
     return next(
-      new ApiError(
-        400,
-        `Customer Name ${customerNameLower} not exist`
-      )
+      new ApiError(400, `Customer Name ${customerNameLower} not exist`)
     );
   }
   // console.log(customer);
-  if(!customer.location.some(lcn=>lcn.address===customerLocationLower)){
+  if (!customer.location.some((lcn) => lcn.address === customerLocationLower)) {
     return next(
       new ApiError(
         400,
@@ -102,7 +101,7 @@ module.exports.createBill = asyncHandler(async (req, res, next) => {
       )
     );
   }
-  const location = await Location.findOne({address:customerLocationLower});
+  const location = await Location.findOne({ address: customerLocationLower });
 
   let basic = 0;
 
@@ -128,14 +127,9 @@ module.exports.createBill = asyncHandler(async (req, res, next) => {
 
     let item = await Item.findOne({ name: itemNameLower }).populate("brand");
     if (!item) {
-      return next(
-        new ApiError(
-          400,
-          `Item ${itemNameLower} not exist`
-        )
-      );
+      return next(new ApiError(400, `Item ${itemNameLower} not exist`));
     }
-    if (!item.brand.some(bnd=>bnd.name===brandNameLower)) {
+    if (!item.brand.some((bnd) => bnd.name === brandNameLower)) {
       return next(
         new ApiError(
           400,
@@ -219,16 +213,14 @@ module.exports.updateBill = asyncHandler(async (req, res, next) => {
   const customerNameLower = customerName.toLowerCase();
   const customerLocationLower = customerLocation.toLowerCase();
 
-  let customer = await Customer.findOne({ name: customerNameLower });
+  let customer = await Customer.findOne({ name: customerNameLower }).populate(
+    "location"
+  );
+  console.log(customer);
   if (!customer) {
-    return next(
-      new ApiError(
-        400,
-        `Customer->${customerNameLower} not exist`
-      )
-    );
+    return next(new ApiError(400, `Customer->${customerNameLower} not exist`));
   }
-  if(!customer.location.some(lcn=>lcn.name===customerLocationLower)){
+  if (!customer.location.some((lcn) => lcn.address === customerLocationLower)) {
     return next(
       new ApiError(
         400,
@@ -236,7 +228,7 @@ module.exports.updateBill = asyncHandler(async (req, res, next) => {
       )
     );
   }
-
+  const location = await Location.findOne({ address: customerLocationLower });
   let basic = 0;
 
   for (const element of items) {
@@ -259,21 +251,13 @@ module.exports.updateBill = asyncHandler(async (req, res, next) => {
     const itemNameLower = element.name.toLowerCase();
     const brandNameLower = element.brand.toLowerCase();
 
-    let item = await Item.findOne({ name: itemNameLower });
+    let item = await Item.findOne({ name: itemNameLower }).populate("brand");
     if (!item) {
-      return next(
-        new ApiError(
-          400,
-          `Item->${itemNameLower} not exist`
-        )
-      );
+      return next(new ApiError(400, `Item->${itemNameLower} not exist`));
     }
-    if (!item.brand.some(bnd=>bnd.name===brandNameLower)) {
+    if (!item.brand.some((bnd) => bnd.name === brandNameLower)) {
       return next(
-        new ApiError(
-          400,
-          `Item->${itemNameLower},${brandNameLower} not exist`
-        )
+        new ApiError(400, `Item->${itemNameLower},${brandNameLower} not exist`)
       );
     }
 
@@ -295,13 +279,13 @@ module.exports.updateBill = asyncHandler(async (req, res, next) => {
   }
 
   const updatedBill = await Bill.updateOne(
-    { number: billNumber }, 
+    { number: billNumber },
     {
       $set: {
         customer: customer._id,
         location: location._id,
         date: billDate,
-        items: items, 
+        items: items,
         tax: {
           basic: basic,
           CGST: {
@@ -334,52 +318,55 @@ module.exports.updateBill = asyncHandler(async (req, res, next) => {
 // getAll bills
 
 module.exports.getBills = asyncHandler(async (req, res, next) => {
-    const { from, to } = req.body;
+  const { from, to } = req.body;
 
-    // Initialize query object
-    const query = {};
+  // Initialize query object
+  const query = {};
 
-    // Build the query object based on 'from' and 'to' dates if provided
-    if (from && to) {
-        // Parse and format 'from' and 'to' dates
-        const [fromYear, fromMonth, fromDay] = from.split('-');
-        const [toYear, toMonth, toDay] = to.split('-');
+  // Build the query object based on 'from' and 'to' dates if provided
+  if (from && to) {
+    // Parse and format 'from' and 'to' dates
+    const [fromYear, fromMonth, fromDay] = from.split("-");
+    const [toYear, toMonth, toDay] = to.split("-");
 
-        const startDate = `${fromYear}-${fromMonth}-${fromDay}T00:00:00.000Z`;
-        const endDate = `${toYear}-${toMonth}-${toDay}T23:59:59.999Z`;
+    const startDate = `${fromYear}-${fromMonth}-${fromDay}T00:00:00.000Z`;
+    const endDate = `${toYear}-${toMonth}-${toDay}T23:59:59.999Z`;
 
-        // Add date range to query
-        query.createdAt = {
-            '$gte': new Date(startDate),
-            '$lte': new Date(endDate)
-        };
-    }
+    // Add date range to query
+    query.date = {
+      $gte: new Date(startDate),
+      $lte: new Date(endDate),
+    };
+  }
 
-    // Fetch bills with sorting by 'updatedAt' in descending order
-        const bills = await Bill.find(query)
-            .populate('customer', 'name')
-            .populate('location', 'address')
-            .sort({ createdAt: -1 }); // Sort by updatedAt in descending order
+  // Fetch bills with sorting by 'updatedAt' in descending order
+  const bills = await Bill.find(query)
+    .populate("customer", "name")
+    .populate("location", "address")
+    .sort({ updateAt: 1 }); // Sort by updatedAt in descending order
 
-        return res.status(200).json(new ApiResponse(200, bills, 'Bills fetched successfully'));
-  
+  return res
+    .status(200)
+    .json(new ApiResponse(200, bills, "Bills fetched successfully"));
 });
-
 
 // delete bill
 
-module.exports.deleteBill = asyncHandler(async(req,res)=>{
-  
-    const { id } = req.params;
-    if (!id) {
-        return res.status(200).json({ success: false, message: 'Bill number is required' });
-    }
+module.exports.deleteBill = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res
+      .status(200)
+      .json({ success: false, message: "Bill number is required" });
+  }
 
-        const result = await Bill.deleteOne({ number: id });
+  const result = await Bill.deleteOne({ number: id });
 
-        if (result.deletedCount === 0) {
-            return res.status(404).json({ success: false, message: 'Bill not found' });
-        }
+  if (result.deletedCount === 0) {
+    return res.status(404).json({ success: false, message: "Bill not found" });
+  }
 
-        return res.status(200).json(new ApiResponse(200,  'Bill deleted successfully'));
-})
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Bill deleted successfully"));
+});
