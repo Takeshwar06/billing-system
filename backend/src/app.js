@@ -12,12 +12,12 @@ const brandRoutes = require("./routes/brand.route");
 
 const app = express();
 app.use(express.json());
-// app.use(
-//   cors({
-//     origin: process.env.CORS_ORIGIN,
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+  })
+);
 
 // app.use((req, res, next) => {
 //   res.header("Access-Control-Allow-Origin", "http://192.168.29.94:81");
