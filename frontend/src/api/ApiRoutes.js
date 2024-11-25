@@ -1,6 +1,6 @@
 // export const host = "http://localhost:4000";
-export const host = "http://127.0.0.1:85"; // this for iis server
-
+//export const host = "http://127.0.0.1:85"; // this for iis server
+export const host="https://billing-system-server-rouge.vercel.app"
 export const getCustomersLocationsItemsBrands = `${host}/api/customer/get-all`;
 
 export const createBill = `${host}/api/bill/create-bill`;
